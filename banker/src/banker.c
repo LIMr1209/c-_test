@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h> //bool类型数据头函数
-#define processNum 5 //五个进程
-#define resourceNum 3 //三类资源
 
 //https://blog.csdn.net/qq_43402639/article/details/102668226
+#define processNum 5 //五个进程
+#define resourceNum 3 //三类资源
 //初始状态
 int p;
 int work[resourceNum];
@@ -74,6 +74,9 @@ void recycle()
 }
 void Test_safety()
 {
+    //检查此时系统的安全性
+    printf("===========安全序列===========\n");
+    printf("process=== Work===== Need =====Allocation=====work+allocation==finish\n");
     int i, j;
     int finish = 0, Done = 0; //Done一轮遍历下完成的，finish总共完成的
     int safeseries[processNum] = { -1,-1,-1,-1,-1 };
@@ -111,13 +114,31 @@ void Test_safety()
         for (i = 0; i < processNum; i++)
             printf("p%d ", safeseries[i]);
         printf("\n");
-        print1(); //打印出此刻系统资源分配状态
+        // need 为0的释放资源 增加 Available
+        /*int flag_count;
+        int count;
+        for (i = 0; i < processNum; i++) {
+            flag_count = 0;
+            for (j = 0; j < resourceNum; j++) {
+                if (Need[i][j] == 0) {
+                    flag_count++;
+                }
+            }
+            if (flag_count == resourceNum) {
+                for (j = 0; j < resourceNum; j++) {
+                    count = Allocation[i][j];
+                    Allocation[i][j] = 0;
+                    Available[j] += Allocation[i][j];
+                }
+            }
+
+        }*/
     }
     else {
         recycle();
         printf("进程死锁，进程P%d请求无法通过!\n", p);
-        print1();
     }
+    print1();
 }
 void judge_assign()
 {
@@ -141,9 +162,6 @@ void judge_assign()
             Available[j] -= Request[j];
             Allocation[p][j] += Request[j];
         }
-        //检查此时系统的安全性
-        printf("===========安全序列===========\n");
-        printf("process=== Work===== Need =====Allocation=====work+allocation==finish\n");
         Test_safety();
 
     }
@@ -153,8 +171,6 @@ int main()
 	setvbuf(stdout,NULL,_IONBF,0);
     int i;
     print1();
-    printf("===========此时安全序列===========\n");
-    printf("process=== Work===== Need =====Allocation=====work+allocation==finish\n");
     Test_safety();
     while (1) {
         printf("存在进程0,1,2,3,4,资源类别0,1,2\n请依次输入请求资源的进程和进程请求的A,B,C类资源数\n例如：1 0 0 1 \n");
@@ -166,3 +182,4 @@ int main()
     }
     return 0;
 }
+
